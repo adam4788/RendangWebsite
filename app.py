@@ -15,29 +15,60 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 
 # Google Sheets configuration
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID', 'your-spreadsheet-id')
+SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
 RANGE_NAME = 'Orders!A:F'
 
 def get_google_sheets_service():
     try:
+        # Log environment variable presence (not their values)
+        required_vars = [
+            'GOOGLE_TYPE',
+            'GOOGLE_PROJECT_ID',
+            'GOOGLE_PRIVATE_KEY_ID',
+            'GOOGLE_PRIVATE_KEY',
+            'GOOGLE_CLIENT_EMAIL',
+            'GOOGLE_CLIENT_ID',
+            'SPREADSHEET_ID'
+        ]
+
+        missing_vars = [var for var in required_vars if not os.environ.get(var)]
+        if missing_vars:
+            logger.error(f"Missing required environment variables: {', '.join(missing_vars)}")
+            return None
+
+        # Get private key and ensure proper formatting
+        private_key = os.environ.get("GOOGLE_PRIVATE_KEY", "")
+        if "\\n" in private_key:
+            private_key = private_key.replace("\\n", "\n")
+
+        # Construct service account info
+        service_account_info = {
+            "type": os.environ.get("GOOGLE_TYPE"),
+            "project_id": os.environ.get("GOOGLE_PROJECT_ID"),
+            "private_key_id": os.environ.get("GOOGLE_PRIVATE_KEY_ID"),
+            "private_key": private_key,
+            "client_email": os.environ.get("GOOGLE_CLIENT_EMAIL"),
+            "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{os.environ.get('GOOGLE_CLIENT_EMAIL')}"
+        }
+
+        logger.debug("Attempting to create credentials with service account info")
         credentials = service_account.Credentials.from_service_account_info(
-            {
-                "type": os.environ.get("GOOGLE_TYPE"),
-                "project_id": os.environ.get("GOOGLE_PROJECT_ID"),
-                "private_key_id": os.environ.get("GOOGLE_PRIVATE_KEY_ID"),
-                "private_key": os.environ.get("GOOGLE_PRIVATE_KEY", "").replace('\\n', '\n'),
-                "client_email": os.environ.get("GOOGLE_CLIENT_EMAIL"),
-                "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{os.environ.get('GOOGLE_CLIENT_EMAIL')}"
-            },
+            service_account_info,
             scopes=SCOPES
         )
-        return build('sheets', 'v4', credentials=credentials)
+
+        logger.debug("Building Google Sheets service")
+        service = build('sheets', 'v4', credentials=credentials)
+        logger.debug("Successfully built Google Sheets service")
+        return service
+
     except Exception as e:
         logger.error(f"Error creating Google Sheets service: {str(e)}")
+        logger.error(f"Error type: {type(e).__name__}")
         return None
 
 @app.route('/')
@@ -57,8 +88,8 @@ def submit_order():
         phone = data.get('phone')
         order_details = data.get('order_details')
         special_instructions = data.get('special_instructions')
-        
-        # Prepare the order data
+
+        logger.debug("Preparing order data for submission")
         order_data = [
             [
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -71,22 +102,26 @@ def submit_order():
         ]
 
         service = get_google_sheets_service()
-        if service:
-            sheet = service.spreadsheets()
-            result = sheet.values().append(
-                spreadsheetId=SPREADSHEET_ID,
-                range=RANGE_NAME,
-                valueInputOption='RAW',
-                insertDataOption='INSERT_ROWS',
-                body={'values': order_data}
-            ).execute()
-            
-            return jsonify({'success': True, 'message': 'Order submitted successfully!'})
-        else:
+        if not service:
+            logger.error("Failed to create Google Sheets service")
             return jsonify({'success': False, 'message': 'Could not connect to order system'}), 500
 
+        logger.debug(f"Attempting to append data to spreadsheet: {SPREADSHEET_ID}")
+        sheet = service.spreadsheets()
+        result = sheet.values().append(
+            spreadsheetId=SPREADSHEET_ID,
+            range=RANGE_NAME,
+            valueInputOption='RAW',
+            insertDataOption='INSERT_ROWS',
+            body={'values': order_data}
+        ).execute()
+
+        logger.debug("Successfully submitted order to Google Sheets")
+        return jsonify({'success': True, 'message': 'Order submitted successfully!'})
+
     except Exception as e:
-        logger.error(f"Error submitting order: {e}")
+        logger.error(f"Error submitting order: {str(e)}")
+        logger.error(f"Error type: {type(e).__name__}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting your order'}), 500
 
 if __name__ == '__main__':

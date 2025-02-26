@@ -5,6 +5,7 @@ from google.oauth2.credentials import Credentials
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime
+from googleapiclient.errors import HttpError
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -16,7 +17,48 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 # Google Sheets configuration
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
-RANGE_NAME = 'Orders!A:F'
+SHEET_NAME = 'Orders'
+HEADERS = [['Timestamp', 'Name', 'Email', 'Phone', 'Order Details', 'Special Instructions']]
+
+def setup_orders_sheet(service):
+    try:
+        # Try to get the sheet to check if it exists
+        service.spreadsheets().values().get(
+            spreadsheetId=SPREADSHEET_ID,
+            range=f"{SHEET_NAME}!A1:F1"
+        ).execute()
+    except HttpError as e:
+        if e.resp.status == 404:
+            # Sheet doesn't exist, create it
+            body = {
+                'requests': [{
+                    'addSheet': {
+                        'properties': {
+                            'title': SHEET_NAME
+                        }
+                    }
+                }]
+            }
+            try:
+                service.spreadsheets().batchUpdate(
+                    spreadsheetId=SPREADSHEET_ID,
+                    body=body
+                ).execute()
+
+                # Add headers
+                service.spreadsheets().values().update(
+                    spreadsheetId=SPREADSHEET_ID,
+                    range=f"{SHEET_NAME}!A1:F1",
+                    valueInputOption='RAW',
+                    body={'values': HEADERS}
+                ).execute()
+
+                logger.debug(f"Created new sheet '{SHEET_NAME}' with headers")
+                return True
+            except Exception as create_error:
+                logger.error(f"Error creating sheet: {str(create_error)}")
+                return False
+    return True
 
 def get_google_sheets_service():
     try:
@@ -42,12 +84,6 @@ def get_google_sheets_service():
             private_key = private_key.replace("\\n", "\n")
         elif r"\n" in private_key:
             private_key = private_key.replace(r"\n", "\n")
-
-        # Ensure the key has proper PEM format
-        if not private_key.startswith("-----BEGIN PRIVATE KEY-----"):
-            logger.error("Private key is not in the correct format")
-            logger.error(f"Key starts with: {private_key[:20]}...")
-            return None
 
         # Log key structure without revealing content
         key_lines = private_key.split('\n')
@@ -121,11 +157,15 @@ def submit_order():
             logger.error("Failed to create Google Sheets service")
             return jsonify({'success': False, 'message': 'Could not connect to order system'}), 500
 
+        # Ensure the Orders sheet exists and has headers
+        if not setup_orders_sheet(service):
+            return jsonify({'success': False, 'message': 'Error setting up order system'}), 500
+
         logger.debug(f"Attempting to append data to spreadsheet: {SPREADSHEET_ID}")
         sheet = service.spreadsheets()
         result = sheet.values().append(
             spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME,
+            range=f"{SHEET_NAME}!A:F",
             valueInputOption='RAW',
             insertDataOption='INSERT_ROWS',
             body={'values': order_data}

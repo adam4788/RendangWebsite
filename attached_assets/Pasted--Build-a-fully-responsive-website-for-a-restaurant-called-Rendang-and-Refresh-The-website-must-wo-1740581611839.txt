@@ -1,0 +1,43 @@
+"Build a fully responsive website for a restaurant called 'Rendang and Refresh'. The website must work perfectly on mobile, tablet, and desktop devices. It should include the following sections/pages:
+
+Navigation Bar:
+
+Fixed at the top with links to 'Home', 'About', 'Menu', 'Order', 'Events', and 'Contact'.
+Use a modern, clean design with a dark background and contrasting text.
+Hero Section (Home Page):
+
+A full-width section with an attractive background image (a placeholder image URL is acceptable).
+Headline: 'Welcome to Rendang and Refresh'.
+Tagline: 'Experience the authentic taste of traditional rendang paired with refreshing beverages.'
+A call-to-action button that scrolls to the Menu section.
+About Section:
+
+A brief description of the restaurant’s concept, history, and passion for authentic flavors.
+Menu Section:
+
+List at least three items (e.g., Classic Beef Rendang, Chicken Rendang, Refreshing Beverages) with short descriptions (and prices if desired).
+Use a responsive grid or card layout.
+Order Section:
+
+Include an order form with fields for customer name, email, phone number, order details (e.g., item selection, quantity), and special instructions.
+On form submission, integrate with Google Sheets (using the Google Sheets API or a similar service) to store the order data in a sheet for easy access.
+Display a success message upon successful submission.
+Events Page:
+
+Create a dedicated page for upcoming events.
+Add a section for the next event with details that 'Rendang and Refresh' will be vendoring at the next Pasar Permias event on April 5th.
+Include information such as event date, time, location, and any additional details or a call-to-action (e.g., 'Learn More' or 'Reserve a Spot').
+Contact Section:
+
+Include contact details: an email (e.g., info@rendangandrefresh.com), phone number, and physical address.
+Footer:
+
+Include copyright information and any other relevant links.
+Additional Requirements:
+
+Use HTML, CSS, and JavaScript (if needed) without external frameworks.
+Implement responsive design with proper meta tags and media queries.
+Choose a color palette that suits a culinary theme (for example, warm reds, oranges, and neutral tones) and a clean, modern sans-serif font (like Arial or Roboto).
+Ensure the code is well-organized into separate files (index.html, styles.css, script.js, and additional pages as needed) with clear comments.
+Do not change the overall structure; stick to the detailed requirements above.
+Provide clear instructions or code comments where integration with Google Sheets is implemented so that future modifications (such as adding API keys or adjusting the integration) can be handled easily.

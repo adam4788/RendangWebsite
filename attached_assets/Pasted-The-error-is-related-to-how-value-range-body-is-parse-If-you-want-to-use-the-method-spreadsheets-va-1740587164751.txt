@@ -1,0 +1,74 @@
+The error is related to how value_range_body is parse. If you want to use the method spreadsheets.values.append, you can base you code in the following sample:
+
+Note: the sample code that I'm using is base on a database, and using OAuth, but the request body should be the same
+
+from __future__ import print_function
+
+import os.path
+
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+
+
+# If modifying these scopes, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/drive.file', 
+          'https://www.googleapis.com/auth/drive',
+          'https://www.googleapis.com/auth/spreadsheets' ]
+
+# The ID and range of a sample spreadsheet.
+spreadsheetId = 'sheetID'
+
+
+
+
+def main():
+
+    creds = None
+
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+
+    try:
+        service = build('sheets', 'v4', credentials=creds)
+        # 'records_df' is the variable with the data that will be inserted in the Sheet. 
+        # In your case it will be the data coming from places API
+        records_db = [['2023-01-18', '1234', 'ABC', 1234], 
+                      ['2023-01-17', '5678', 'DEF', 5678], 
+                      ['2023-01-16', '9012', 'ABC', 9012]]
+
+        # 'range_db' is the range of the where the data will be added.
+        range_db = "Sheet1"
+        value_input_option = "RAW"
+        insert_data_option = "INSERT_ROWS"
+
+        # This is the 'value_range_body' or JSON
+        value_range_body = {
+                        "majorDimension": "ROWS",
+                        "values": records_db,
+                        }
+
+        request = service.spreadsheets().values().append(spreadsheetId=spreadsheetId, 
+                                                         range=range_db, 
+                                                         valueInputOption=value_input_option, 
+                                                         insertDataOption=insert_data_option, 
+                                                         body=value_range_body)
+        response = request.execute()
+
+    except HttpError as err:
+        print(err)
+
+if __name__ == '__main__':
+    main()

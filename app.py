@@ -40,6 +40,13 @@ def get_google_sheets_service():
         private_key = os.environ.get("GOOGLE_PRIVATE_KEY", "")
         if "\\n" in private_key:
             private_key = private_key.replace("\\n", "\n")
+        elif r"\n" in private_key:
+            private_key = private_key.replace(r"\n", "\n")
+
+        # Ensure the key has proper PEM format
+        if not private_key.startswith("-----BEGIN PRIVATE KEY-----"):
+            logger.error("Private key is not in the correct format")
+            return None
 
         # Construct service account info
         service_account_info = {

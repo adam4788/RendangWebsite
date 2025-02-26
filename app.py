@@ -165,10 +165,13 @@ def submit_order():
         sheet = service.spreadsheets()
         result = sheet.values().append(
             spreadsheetId=SPREADSHEET_ID,
-            range=f"{SHEET_NAME}!A1",
+            range=f"{SHEET_NAME}",
             valueInputOption='RAW',
             insertDataOption='INSERT_ROWS',
-            body={'values': order_data}
+            body={
+                "majorDimension": "ROWS",
+                "values": order_data
+            }
         ).execute()
 
         logger.debug("Successfully submitted order to Google Sheets")

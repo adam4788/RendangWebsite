@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="home" class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Rendang and Refresh</h1>
+        <p>Experience the authentic taste of traditional rendang paired with refreshing beverages.</p>
+        <a href="#menu" class="cta-button">View Our Menu</a>
+    </div>
+</section>
+
+<section id="about" class="about">
+    <div class="container">
+        <h2>About Us</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>At Rendang and Refresh, we take pride in bringing you authentic Indonesian cuisine with a modern twist. Our signature rendang dishes are prepared using time-honored recipes passed down through generations, while our refreshing beverages provide the perfect complement to these rich, flavorful dishes.</p>
+                <p>Founded with a passion for sharing traditional flavors, we ensure each dish is crafted with care and the finest ingredients, delivering an unforgettable dining experience that bridges culture and cuisine.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="menu" class="menu">
+    <div class="container">
+        <h2>Our Menu</h2>
+        <div class="menu-grid">
+            <div class="menu-item">
+                <div class="menu-item-content">
+                    <h3>Classic Beef Rendang</h3>
+                    <p>Tender beef slow-cooked in coconut milk and aromatic spices</p>
+                    <span class="price">$18.99</span>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-item-content">
+                    <h3>Chicken Rendang</h3>
+                    <p>Succulent chicken prepared in our signature rendang sauce</p>
+                    <span class="price">$16.99</span>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-item-content">
+                    <h3>Refreshing Beverages</h3>
+                    <p>Selection of traditional and modern drinks</p>
+                    <span class="price">From $4.99</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="order" class="order">
+    <div class="container">
+        <h2>Place Your Order</h2>
+        <form id="order-form" class="order-form">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="order_details">Order Details</label>
+                <textarea id="order_details" name="order_details" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="special_instructions">Special Instructions</label>
+                <textarea id="special_instructions" name="special_instructions"></textarea>
+            </div>
+            <button type="submit" class="submit-button">Submit Order</button>
+        </form>
+        <div id="order-message" class="order-message"></div>
+    </div>
+</section>
+
+<section id="contact" class="contact">
+    <div class="container">
+        <h2>Contact Us</h2>
+        <div class="contact-info">
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <p>info@rendangandrefresh.com</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <p>(555) 123-4567</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>123 Culinary Street, Foodie City</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -46,7 +46,15 @@ def get_google_sheets_service():
         # Ensure the key has proper PEM format
         if not private_key.startswith("-----BEGIN PRIVATE KEY-----"):
             logger.error("Private key is not in the correct format")
+            logger.error(f"Key starts with: {private_key[:20]}...")
             return None
+
+        # Log key structure without revealing content
+        key_lines = private_key.split('\n')
+        logger.debug(f"Private key structure:")
+        logger.debug(f"First line: {key_lines[0]}")
+        logger.debug(f"Number of lines: {len(key_lines)}")
+        logger.debug(f"Last line: {key_lines[-1] if key_lines else 'No lines found'}")
 
         # Construct service account info
         service_account_info = {

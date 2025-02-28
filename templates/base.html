@@ -24,9 +24,33 @@
             <li><a href="/#menu">Menu</a></li>
             <li><a href="/#order">Order</a></li>
             <li><a href="/events">Events</a></li>
-            <li><a href="/#contact">Contact</a></li>
+            <li>
+                <a href="#" id="cart-toggle">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </li>
         </ul>
     </nav>
+
+    <!-- Shopping Cart Sidebar -->
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-cart"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-amount">$0.00</span>
+            </div>
+            <button class="checkout-button">Proceed to Checkout</button>
+        </div>
+    </div>
+    <div class="cart-overlay"></div>
 
     {% block content %}{% endblock %}
 

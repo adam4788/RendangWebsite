@@ -1,4 +1,142 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Cart state
+    let cart = {
+        items: {},
+        total: 0
+    };
+
+    // Cart DOM elements
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartSidebar = document.querySelector('.cart-sidebar');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    const closeCart = document.querySelector('.close-cart');
+    const cartItemsContainer = document.querySelector('.cart-items');
+    const cartCount = document.querySelector('.cart-count');
+    const totalAmount = document.querySelector('.total-amount');
+    const checkoutButton = document.querySelector('.checkout-button');
+
+    // Toggle cart sidebar
+    function toggleCart() {
+        cartSidebar.classList.toggle('active');
+        cartOverlay.classList.toggle('active');
+    }
+
+    cartToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleCart();
+    });
+
+    closeCart.addEventListener('click', toggleCart);
+    cartOverlay.addEventListener('click', toggleCart);
+
+    // Add to cart functionality
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const price = parseFloat(this.dataset.price);
+
+            addToCart(id, name, price);
+            updateCartDisplay();
+
+            // Show cart after adding item
+            if (!cartSidebar.classList.contains('active')) {
+                toggleCart();
+            }
+        });
+    });
+
+    function addToCart(id, name, price) {
+        if (cart.items[id]) {
+            cart.items[id].quantity++;
+        } else {
+            cart.items[id] = {
+                name: name,
+                price: price,
+                quantity: 1
+            };
+        }
+        updateCartTotal();
+    }
+
+    function removeFromCart(id) {
+        if (cart.items[id]) {
+            delete cart.items[id];
+            updateCartTotal();
+            updateCartDisplay();
+        }
+    }
+
+    function updateQuantity(id, delta) {
+        if (cart.items[id]) {
+            cart.items[id].quantity += delta;
+            if (cart.items[id].quantity <= 0) {
+                removeFromCart(id);
+            } else {
+                updateCartTotal();
+                updateCartDisplay();
+            }
+        }
+    }
+
+    function updateCartTotal() {
+        cart.total = Object.values(cart.items).reduce((sum, item) => {
+            return sum + (item.price * item.quantity);
+        }, 0);
+
+        // Update display
+        totalAmount.textContent = `$${cart.total.toFixed(2)}`;
+        cartCount.textContent = Object.values(cart.items).reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function updateCartDisplay() {
+        cartItemsContainer.innerHTML = '';
+
+        for (const [id, item] of Object.entries(cart.items)) {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.name}</div>
+                    <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn minus" data-id="${id}">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn plus" data-id="${id}">+</button>
+                        <button class="quantity-btn remove" data-id="${id}">×</button>
+                    </div>
+                </div>
+            `;
+            cartItemsContainer.appendChild(cartItem);
+
+            // Add event listeners to quantity buttons
+            cartItem.querySelector('.minus').addEventListener('click', () => updateQuantity(id, -1));
+            cartItem.querySelector('.plus').addEventListener('click', () => updateQuantity(id, 1));
+            cartItem.querySelector('.remove').addEventListener('click', () => removeFromCart(id));
+        }
+    }
+
+    // Checkout button handler
+    checkoutButton.addEventListener('click', function() {
+        if (Object.keys(cart.items).length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+
+        // Auto-fill order details in the order form
+        const orderDetails = document.getElementById('order_details');
+        if (orderDetails) {
+            const cartSummary = Object.values(cart.items)
+                .map(item => `${item.name} x${item.quantity} ($${(item.price * item.quantity).toFixed(2)})`)
+                .join('\n');
+            orderDetails.value = cartSummary + `\n\nTotal: $${cart.total.toFixed(2)}`;
+        }
+
+        // Scroll to order form
+        document.querySelector('#order').scrollIntoView({ behavior: 'smooth' });
+        toggleCart();
+    });
+
     // Navigation toggle and scroll behavior
     const navbar = document.querySelector('.navbar');
     const navbarToggle = document.querySelector('.navbar-toggle');
@@ -18,6 +156,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            if (this.getAttribute('href') === '#') return;
+
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                // Close mobile menu if open
+                navbarMenu.classList.remove('active');
+            }
+        });
+    });
     // Scroll reveal animation for sections
     const sections = document.querySelectorAll('section');
     const revealSection = function(entries, observer) {
@@ -39,21 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
         sectionObserver.observe(section);
     });
 
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                // Close mobile menu if open
-                navbarMenu.classList.remove('active');
-            }
-        });
-    });
 
     // Menu item hover effect
     const menuItems = document.querySelectorAll('.menu-item');

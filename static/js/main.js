@@ -328,4 +328,93 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'translateY(0)';
         });
     });
+
+    const lookupForm = document.getElementById('lookup-form');
+    const lookupResults = document.getElementById('lookup-results');
+    const lookupMessage = document.getElementById('lookup-message');
+
+    if (lookupForm) {
+        lookupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const searchType = document.getElementById('search_type').value;
+            const searchValue = document.getElementById('search_value').value;
+
+            // Show loading state
+            const submitButton = lookupForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Searching...';
+            submitButton.disabled = true;
+            submitButton.classList.add('loading');
+
+            // Clear previous results and messages
+            lookupResults.innerHTML = '';
+            lookupMessage.className = 'lookup-message';
+            lookupMessage.textContent = '';
+
+            fetch('/search_order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    search_type: searchType,
+                    search_value: searchValue
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    data.orders.forEach(order => {
+                        const orderCard = document.createElement('div');
+                        orderCard.className = 'order-card';
+                        orderCard.innerHTML = `
+                            <div class="order-header">
+                                <h3>Order Details</h3>
+                                <span class="order-date">${order.timestamp}</span>
+                            </div>
+                            <div class="order-details">
+                                <strong>Items:</strong><br>
+                                ${order.order_details.split('\n').join('<br>')}
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-meta-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>${order.name}</span>
+                                </div>
+                                <div class="order-meta-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>${order.email}</span>
+                                </div>
+                                <div class="order-meta-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>${order.phone}</span>
+                                </div>
+                            </div>
+                            ${order.special_instructions ? `
+                                <div class="special-instructions">
+                                    <strong>Special Instructions:</strong><br>
+                                    ${order.special_instructions}
+                                </div>
+                            ` : ''}
+                        `;
+                        lookupResults.appendChild(orderCard);
+                    });
+                } else {
+                    lookupMessage.className = 'lookup-message error';
+                    lookupMessage.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                lookupMessage.className = 'lookup-message error';
+                lookupMessage.textContent = 'An error occurred while searching for your order';
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+            });
+        });
+    }
 });

@@ -188,5 +188,70 @@ def submit_order():
         logger.error(f"Error type: {type(e).__name__}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting your order'}), 500
 
+@app.route('/lookup')
+def lookup():
+    return render_template('lookup.html')
+
+@app.route('/search_order', methods=['POST'])
+def search_order():
+    try:
+        data = request.get_json()
+        search_type = data.get('search_type')
+        search_value = data.get('search_value')
+
+        if not search_type or not search_value:
+            return jsonify({'success': False, 'message': 'Please provide search criteria'}), 400
+
+        service = get_google_sheets_service()
+        if not service:
+            return jsonify({'success': False, 'message': 'Could not connect to order system'}), 500
+
+        # Get all orders from the sheet
+        result = service.spreadsheets().values().get(
+            spreadsheetId=SPREADSHEET_ID,
+            range=f"{SHEET_NAME}!A:F"
+        ).execute()
+
+        values = result.get('values', [])
+        if len(values) <= 1:  # Only headers or empty sheet
+            return jsonify({'success': False, 'message': 'No orders found'}), 404
+
+        # Find matching orders
+        headers = values[0]
+        matching_orders = []
+
+        # Search in the appropriate column (email or phone)
+        search_column = 2 if search_type == 'email' else 3  # email is column C (2), phone is column D (3)
+
+        for row in values[1:]:  # Skip header row
+            if len(row) > search_column and row[search_column].lower() == search_value.lower():
+                order = {
+                    'timestamp': row[0],
+                    'name': row[1],
+                    'email': row[2],
+                    'phone': row[3],
+                    'order_details': row[4],
+                    'special_instructions': row[5] if len(row) > 5 else ''
+                }
+                matching_orders.append(order)
+
+        if not matching_orders:
+            return jsonify({
+                'success': False,
+                'message': f'No orders found for this {search_type}'
+            }), 404
+
+        return jsonify({
+            'success': True,
+            'orders': matching_orders
+        })
+
+    except Exception as e:
+        logger.error(f"Error searching orders: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'An error occurred while searching for your order'
+        }), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

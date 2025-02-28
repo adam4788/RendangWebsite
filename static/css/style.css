@@ -121,9 +121,21 @@ body {
     transform: scale(1.05);
 }
 
+.navbar-toggle {
+    display: none; /* Hide by default */
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
 .navbar-menu {
     display: flex;
     list-style: none;
+    align-items: center;
+    gap: 1rem;
 }
 
 .navbar-menu li a {
@@ -150,6 +162,50 @@ body {
     width: 100%;
 }
 
+/* Only show hamburger menu and adjust layout on mobile */
+@media (max-width: 992px) {
+    .navbar-toggle {
+        display: block;
+    }
+
+    .navbar-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        padding: 1rem 0;
+        flex-direction: column;
+        transform: translateY(-10px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-menu.active {
+        display: flex;
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .navbar-menu li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .navbar-menu li a {
+        display: block;
+        padding: 1rem;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+}
 /* Hero Section */
 .hero {
     height: 100vh;

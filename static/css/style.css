@@ -971,13 +971,24 @@ section.visible {
     color: var(--primary-color);
 }
 
+.lookup-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
 .lookup-form-container {
-    max-width: 600px;
-    margin: 0 auto;
     background-color: white;
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 20px var(--shadow-color);
+    position: sticky;
+    top: 120px;
+}
+
+.lookup-results-container {
+    min-height: 400px;
 }
 
 .lookup-form select {
@@ -1001,18 +1012,19 @@ section.visible {
 }
 
 .lookup-results {
-    margin-top: 2rem;
+    display: grid;
+    gap: 1.5rem;
 }
 
 .order-card {
     background-color: white;
     border-radius: 12px;
     padding: 1.5rem;
-    margin-bottom: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     opacity: 0;
     transform: translateY(20px);
     animation: slideIn 0.3s ease forwards;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .order-card:hover {
@@ -1058,6 +1070,12 @@ section.visible {
     color: var(--accent-color);
 }
 
+.special-instructions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
 @keyframes slideIn {
     to {
         opacity: 1;
@@ -1080,4 +1098,17 @@ section.visible {
 .lookup-message.success {
     background-color: #d4edda;
     color: #155724;
+}
+
+@media (max-width: 992px) {
+    .lookup-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .lookup-form-container {
+        position: relative;
+        top: 0;
+        max-width: 600px;
+        margin: 0 auto;
+    }
 }

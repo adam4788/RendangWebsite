@@ -165,7 +165,7 @@ def submit_order():
         sheet = service.spreadsheets()
         result = sheet.values().append(
             spreadsheetId=SPREADSHEET_ID,
-            range=f"{SHEET_NAME}",
+            range=f"{SHEET_NAME}!A1",
             valueInputOption='RAW',
             insertDataOption='INSERT_ROWS',
             body={

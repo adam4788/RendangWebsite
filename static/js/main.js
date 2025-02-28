@@ -156,76 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleCart();
     });
 
-    // Navigation toggle and scroll behavior
-    const navbar = document.querySelector('.navbar');
-    const navbarToggle = document.querySelector('.navbar-toggle');
-    const navbarMenu = document.querySelector('.navbar-menu');
-
-    // Toggle mobile menu
-    navbarToggle.addEventListener('click', function() {
-        navbarMenu.classList.toggle('active');
-    });
-
-    // Navbar scroll behavior
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            if (this.getAttribute('href') === '#') return;
-
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                // Close mobile menu if open
-                navbarMenu.classList.remove('active');
-            }
-        });
-    });
-    // Scroll reveal animation for sections
-    const sections = document.querySelectorAll('section');
-    const revealSection = function(entries, observer) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    };
-
-    const sectionObserver = new IntersectionObserver(revealSection, {
-        root: null,
-        threshold: 0.15
-    });
-
-    sections.forEach(section => {
-        section.classList.remove('visible'); // Ensure sections start hidden
-        sectionObserver.observe(section);
-    });
-
-
-    // Menu item hover effect
-    const menuItems = document.querySelectorAll('.menu-item');
-    menuItems.forEach(item => {
-        item.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-        });
-        item.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-
-    // Enhanced form interaction
+    //Form validation and submission code from edited snippet
     const orderForm = document.getElementById('order-form');
     const orderMessage = document.getElementById('order-message');
     const formInputs = document.querySelectorAll('.form-group input, .form-group textarea');
@@ -328,4 +259,73 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Navigation toggle and scroll behavior
+    const navbar = document.querySelector('.navbar');
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+
+    // Toggle mobile menu
+    navbarToggle.addEventListener('click', function() {
+        navbarMenu.classList.toggle('active');
+    });
+
+    // Navbar scroll behavior
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            if (this.getAttribute('href') === '#') return;
+
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                // Close mobile menu if open
+                navbarMenu.classList.remove('active');
+            }
+        });
+    });
+    // Scroll reveal animation for sections
+    const sections = document.querySelectorAll('section');
+    const revealSection = function(entries, observer) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const sectionObserver = new IntersectionObserver(revealSection, {
+        root: null,
+        threshold: 0.15
+    });
+
+    sections.forEach(section => {
+        section.classList.remove('visible'); // Ensure sections start hidden
+        sectionObserver.observe(section);
+    });
+
+
+    // Menu item hover effect
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
 });

@@ -1,4 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Announcement banner functionality
+    const announcementBanner = document.querySelector('.announcement-banner');
+    const closeAnnouncement = document.querySelector('.close-announcement');
+
+    if (closeAnnouncement && announcementBanner) {
+        // Check if user has previously closed the banner
+        const isAnnouncementClosed = localStorage.getItem('announcementClosed');
+
+        if (isAnnouncementClosed) {
+            announcementBanner.classList.add('hidden');
+        }
+
+        closeAnnouncement.addEventListener('click', () => {
+            announcementBanner.classList.add('hidden');
+            // Store user preference
+            localStorage.setItem('announcementClosed', 'true');
+        });
+    }
+
     // Cart state
     let cart = {
         items: {},

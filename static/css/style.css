@@ -1,3 +1,64 @@
+/* Add at the beginning of the file, before other styles */
+.announcement-banner {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.75rem 2rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.announcement-banner.hidden {
+    transform: translateY(-100%);
+}
+
+.announcement-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+}
+
+.announcement-content i {
+    font-size: 1.2rem;
+}
+
+.announcement-content a {
+    color: white;
+    text-decoration: underline;
+    margin-left: 0.5rem;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+}
+
+.announcement-content a:hover {
+    opacity: 0.8;
+}
+
+.close-announcement {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.5rem;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.close-announcement:hover {
+    opacity: 1;
+}
+
 /* Base Styles */
 :root {
     --primary-color: #1A1A1A;
@@ -40,6 +101,7 @@ body {
     justify-content: space-between;
     align-items: center;
     transition: all 0.3s ease;
+    margin-top: 3rem; /* Height of the banner */
 }
 
 .navbar.scrolled {
@@ -314,6 +376,15 @@ section.visible {
 
     .hero p {
         font-size: 1rem;
+    }
+    .announcement-content {
+        font-size: 0.9rem;
+        text-align: center;
+        padding-right: 2rem;
+    }
+
+    .navbar {
+        margin-top: 3.5rem; /* Slightly more space on mobile */
     }
 }
 

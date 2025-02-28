@@ -22,14 +22,20 @@ HEADERS = [['Timestamp', 'Name', 'Email', 'Phone', 'Order Details', 'Special Ins
 
 def setup_orders_sheet(service):
     try:
-        # Try to get the sheet to check if it exists
-        service.spreadsheets().values().get(
-            spreadsheetId=SPREADSHEET_ID,
-            range=f"{SHEET_NAME}!A1:F1"
-        ).execute()
-    except HttpError as e:
-        if e.resp.status == 404:
+        # Try to get sheet metadata first to check if the sheet exists
+        spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+        sheet_exists = False
+        
+        # Check if "Orders" sheet exists in the spreadsheet
+        for sheet in spreadsheet.get('sheets', []):
+            if sheet.get('properties', {}).get('title') == SHEET_NAME:
+                sheet_exists = True
+                logger.debug(f"Sheet '{SHEET_NAME}' already exists")
+                break
+                
+        if not sheet_exists:
             # Sheet doesn't exist, create it
+            logger.debug(f"Sheet '{SHEET_NAME}' doesn't exist, creating it")
             body = {
                 'requests': [{
                     'addSheet': {
@@ -39,26 +45,26 @@ def setup_orders_sheet(service):
                     }
                 }]
             }
-            try:
-                service.spreadsheets().batchUpdate(
-                    spreadsheetId=SPREADSHEET_ID,
-                    body=body
-                ).execute()
-
-                # Add headers
-                service.spreadsheets().values().update(
-                    spreadsheetId=SPREADSHEET_ID,
-                    range=f"{SHEET_NAME}!A1:F1",
-                    valueInputOption='RAW',
-                    body={'values': HEADERS}
-                ).execute()
-
-                logger.debug(f"Created new sheet '{SHEET_NAME}' with headers")
-                return True
-            except Exception as create_error:
-                logger.error(f"Error creating sheet: {str(create_error)}")
-                return False
-    return True
+            service.spreadsheets().batchUpdate(
+                spreadsheetId=SPREADSHEET_ID,
+                body=body
+            ).execute()
+            
+            # Add headers
+            service.spreadsheets().values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=f"{SHEET_NAME}!A1:F1",
+                valueInputOption='RAW',
+                body={'values': HEADERS}
+            ).execute()
+            
+            logger.debug(f"Created new sheet '{SHEET_NAME}' with headers")
+            
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error setting up sheet: {str(e)}")
+        return False
 
 def get_google_sheets_service():
     try:
@@ -165,7 +171,7 @@ def submit_order():
         sheet = service.spreadsheets()
         result = sheet.values().append(
             spreadsheetId=SPREADSHEET_ID,
-            range=f"{SHEET_NAME}!A1",
+            range=f"{SHEET_NAME}!A:F",  # Using A:F range format instead of A1
             valueInputOption='RAW',
             insertDataOption='INSERT_ROWS',
             body={

@@ -1055,11 +1055,12 @@ section.visible {
     border-radius: 12px;
     box-shadow: 0 4px 20px var(--shadow-color);
     position: sticky;
-    top: 120px;
+    top: calc(var(--total-offset) + 20px);
 }
 
 .lookup-results-container {
     min-height: 400px;
+    padding: 1rem;
 }
 
 .lookup-form select {
@@ -1096,6 +1097,7 @@ section.visible {
     transform: translateY(20px);
     animation: slideIn 0.3s ease forwards;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
 }
 
 .order-card:hover {
@@ -1119,6 +1121,7 @@ section.visible {
 
 .order-details {
     margin: 1rem 0;line-height: 1.6;
+    white-space: pre-line;
 }
 
 .order-meta {
@@ -1144,6 +1147,7 @@ section.visible {
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid #eee;
+    white-space: pre-line;
 }
 
 @keyframes slideIn {
@@ -1173,6 +1177,7 @@ section.visible {
 @media (max-width: 992px) {
     .lookup-layout {
         grid-template-columns: 1fr;
+        gap: 2rem;
     }
 
     .lookup-form-container {
@@ -1180,6 +1185,14 @@ section.visible {
         top: 0;
         max-width: 600px;
         margin: 0 auto;
+    }
+
+    .lookup-results-container {
+        padding: 0;
+    }
+
+    .order-meta {
+        grid-template-columns: 1fr;
     }
 }
 

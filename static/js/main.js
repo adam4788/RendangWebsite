@@ -74,7 +74,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 price: price,
                 quantity: 1
             };
+
+            // Show quantity controls
+            const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+            const addButton = menuItem.querySelector('.add-to-cart-btn');
+            const quantityControls = menuItem.querySelector('.quantity-controls');
+
+            addButton.classList.add('hidden');
+            quantityControls.classList.remove('hidden');
         }
+
+        // Update quantity display in menu
+        updateMenuItemQuantity(id);
         updateCartTotal();
     }
 
@@ -91,7 +102,16 @@ document.addEventListener('DOMContentLoaded', function() {
             cart.items[id].quantity += delta;
             if (cart.items[id].quantity <= 0) {
                 removeFromCart(id);
+
+                // Show add to cart button again
+                const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+                const addButton = menuItem.querySelector('.add-to-cart-btn');
+                const quantityControls = menuItem.querySelector('.quantity-controls');
+
+                addButton.classList.remove('hidden');
+                quantityControls.classList.add('hidden');
             } else {
+                updateMenuItemQuantity(id);
                 updateCartTotal();
                 updateCartDisplay();
             }
@@ -417,4 +437,26 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    function updateMenuItemQuantity(id) {
+        const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+        const quantityDisplay = menuItem.querySelector('.quantity');
+        if (quantityDisplay) {
+            quantityDisplay.textContent = cart.items[id].quantity;
+        }
+    }
+
+    // Add event listeners for quantity controls in menu items
+    document.querySelectorAll('.menu-item').forEach(item => {
+        const id = item.dataset.id;
+        const quantityControls = item.querySelector('.quantity-controls');
+
+        if (quantityControls) {
+            const minusBtn = quantityControls.querySelector('.minus');
+            const plusBtn = quantityControls.querySelector('.plus');
+
+            minusBtn.addEventListener('click', () => updateQuantity(id, -1));
+            plusBtn.addEventListener('click', () => updateQuantity(id, 1));
+        }
+    });
 });

@@ -67,6 +67,15 @@
     --secondary-color: #FFDAB9;
     --background-light: #f9f9f9;
     --shadow-color: rgba(0, 0, 0, 0.1);
+    --banner-height: 3rem;
+    --nav-height: 4rem;
+    --total-offset: calc(var(--banner-height) + var(--nav-height));
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+    overflow-y: scroll;
 }
 
 * {
@@ -80,6 +89,13 @@ body {
     line-height: 1.6;
     color: var(--primary-color);
     overflow-x: hidden;
+    padding-top: var(--total-offset);
+}
+
+section {
+    scroll-snap-align: start;
+    scroll-margin-top: var(--total-offset);
+    min-height: calc(100vh - var(--total-offset));
 }
 
 .container {
@@ -94,14 +110,13 @@ body {
     backdrop-filter: blur(10px);
     position: fixed;
     width: 100%;
-    top: 0;
+    top: var(--banner-height); /* Adjust for banner height */
     z-index: 1000;
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: all 0.3s ease;
-    margin-top: 3rem; /* Height of the banner */
 }
 
 .navbar.scrolled {
@@ -1103,8 +1118,7 @@ section.visible {
 }
 
 .order-details {
-    margin: 1rem 0;
-    line-height: 1.6;
+    margin: 1rem 0;line-height: 1.6;
 }
 
 .order-meta {
@@ -1167,4 +1181,53 @@ section.visible {
         max-width: 600px;
         margin: 0 auto;
     }
+}
+
+/* Add these styles for the quantity controls */
+.item-controls {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: white;
+    padding: 0.25rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quantity-controls.hidden {
+    display: none;
+}
+
+.quantity-controls .quantity {
+    min-width: 1.5rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.quantity-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
 }

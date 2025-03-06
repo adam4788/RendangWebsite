@@ -1313,14 +1313,16 @@ section.visible {
 
 /* Add these styles to handle the logo */
 .navbar-logo {
-    height: 50px;
+    height: 70px;
     width: auto;
     transition: transform 0.3s ease;
+    padding: 0.5rem 0;
 }
 
 .navbar-brand {
     display: flex;
     align-items: center;
+    padding-right: 2rem;
 }
 
 .navbar-brand a {
@@ -1338,7 +1340,7 @@ section.visible {
 }
 
 .footer-logo-img {
-    height: 60px;
+    height: 80px;
     width: auto;
     margin-bottom: 1rem;
     filter: brightness(0) invert(1); /* Make logo white in footer */
@@ -1346,10 +1348,20 @@ section.visible {
 
 @media (max-width: 768px) {
     .navbar-logo {
-        height: 40px;
+        height: 60px;
     }
 
     .footer-logo-img {
+        height: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-logo {
         height: 50px;
+    }
+
+    .footer-logo-img {
+        height: 60px;
     }
 }

@@ -24,6 +24,71 @@ document.addEventListener('DOMContentLoaded', function() {
         total: 0
     };
 
+    function updateQuantity(id, delta) {
+        const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+        const plusBtn = menuItem.querySelector('.plus');
+        const name = plusBtn.dataset.name;
+        const price = parseFloat(plusBtn.dataset.price);
+
+        if (!cart.items[id] && delta > 0) {
+            // Adding item for the first time
+            cart.items[id] = {
+                name: name,
+                price: price,
+                quantity: 0
+            };
+        }
+
+        if (cart.items[id]) {
+            const newQuantity = (cart.items[id].quantity || 0) + delta;
+
+            if (newQuantity <= 0) {
+                delete cart.items[id];
+            } else {
+                cart.items[id].quantity = newQuantity;
+            }
+
+            updateMenuItemQuantity(id, newQuantity);
+            updateCartTotal();
+            updateCartDisplay();
+        }
+    }
+
+    function updateMenuItemQuantity(id, quantity = 0) {
+        const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+        const quantityDisplay = menuItem.querySelector('.quantity');
+        const minusBtn = menuItem.querySelector('.minus');
+
+        if (quantityDisplay) {
+            quantityDisplay.textContent = quantity;
+
+            // Update minus button state
+            if (quantity > 0) {
+                minusBtn.style.opacity = '1';
+            } else {
+                minusBtn.style.opacity = '0.5';
+            }
+        }
+    }
+
+    // Initialize quantity controls
+    document.querySelectorAll('.menu-item').forEach(item => {
+        const id = item.dataset.id;
+        const quantityControls = item.querySelector('.quantity-controls');
+
+        if (quantityControls) {
+            const minusBtn = quantityControls.querySelector('.minus');
+            const plusBtn = quantityControls.querySelector('.plus');
+
+            minusBtn.addEventListener('click', () => updateQuantity(id, -1));
+            plusBtn.addEventListener('click', () => updateQuantity(id, 1));
+
+            // Initialize quantity display
+            updateMenuItemQuantity(id, 0);
+        }
+    });
+
+
     // Cart DOM elements
     const cartToggle = document.getElementById('cart-toggle');
     const cartSidebar = document.querySelector('.cart-sidebar');
@@ -97,26 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function updateQuantity(id, delta) {
-        if (cart.items[id]) {
-            cart.items[id].quantity += delta;
-            if (cart.items[id].quantity <= 0) {
-                removeFromCart(id);
-
-                // Show add to cart button again
-                const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
-                const addButton = menuItem.querySelector('.add-to-cart-btn');
-                const quantityControls = menuItem.querySelector('.quantity-controls');
-
-                addButton.classList.remove('hidden');
-                quantityControls.classList.add('hidden');
-            } else {
-                updateMenuItemQuantity(id);
-                updateCartTotal();
-                updateCartDisplay();
-            }
-        }
-    }
 
     function updateCartTotal() {
         cart.total = Object.values(cart.items).reduce((sum, item) => {
@@ -438,15 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function updateMenuItemQuantity(id) {
-        const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
-        const quantityDisplay = menuItem.querySelector('.quantity');
-        if (quantityDisplay) {
-            quantityDisplay.textContent = cart.items[id].quantity;
-        }
-    }
-
-    // Add event listeners for quantity controls in menu items
+    // Add event listeners for quantity controls in menu items (This part was already present, but is now integrated with the new updateQuantity and updateMenuItemQuantity functions)
     document.querySelectorAll('.menu-item').forEach(item => {
         const id = item.dataset.id;
         const quantityControls = item.querySelector('.quantity-controls');

@@ -292,6 +292,10 @@ section.visible {
     transition: all 0.3s ease;
     position: relative;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 200px;
 }
 
 .menu-item:hover {
@@ -302,39 +306,115 @@ section.visible {
 .menu-item-content {
     padding: 1.5rem;
     position: relative;
-    z-index: 1;
-}
-
-.menu-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, var(--accent-color), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.menu-item:hover::before {
-    opacity: 0.1;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .menu-item h3 {
     color: var(--primary-color);
-    margin-bottom: 0.5rem;
-    transition: color 0.3s ease;
+    margin-bottom: 0.75rem;
+    font-size: 1.4rem;
 }
 
-.menu-item:hover h3 {
-    color: var(--accent-color);
+.menu-item p {
+    color: #666;
+    margin-bottom: 1rem;
+    flex-grow: 1;
 }
 
 .menu-item .price {
     color: var(--accent-color);
     font-weight: 700;
     font-size: 1.25rem;
+    display: block;
+    margin-bottom: 3rem;
+}
+
+.item-controls {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--accent-color);
+    transition: all 0.3s ease;
+}
+
+.quantity-controls:hover {
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+}
+
+.quantity-controls .quantity {
+    min-width: 2rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.quantity-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: var(--accent-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.quantity-btn:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.quantity-btn.minus {
+    opacity: 0.5;
+}
+
+.quantity-btn.minus:hover {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .menu-item {
+        min-height: 180px;
+    }
+
+    .menu-item-content {
+        padding: 1.25rem;
+    }
+
+    .item-controls {
+        bottom: 1.25rem;
+        right: 1.25rem;
+    }
+
+    .quantity-controls {
+        padding: 0.4rem 0.6rem;
+    }
+
+    .quantity-btn {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 /* Form Styles */
@@ -855,67 +935,6 @@ section.visible {
 }
 
 
-/* Update quantity controls styles */
-.item-controls {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: white;
-    padding: 0.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #eee;
-}
-
-.quantity-controls .quantity {
-    min-width: 2rem;
-    text-align: center;
-    font-weight: 500;
-    color: var(--primary-color);
-}
-
-.quantity-btn {
-    width: 28px;
-    height: 28px;
-    border: 1px solid var(--accent-color);
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    color: var(--accent-color);
-    font-weight: bold;
-}
-
-.quantity-btn:hover {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-.quantity-btn.minus {
-    opacity: 0.5;
-}
-
-.quantity-btn.minus:hover {
-    opacity: 1;
-}
-
-/* Hide the old add to cart button */
-.add-to-cart-btn {
-    display: none;
-}
-
 /* Events Page Styles */
 .events-page {
     padding: 8rem 0 5rem;
@@ -1116,8 +1135,7 @@ section.visible {
 .order-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+    align-items: center; margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
     border-bottom: 2px solid #eee;
 }
@@ -1155,7 +1173,8 @@ section.visible {
 }
 
 .order-meta-item {
-    display: flex;align-items: center;
+    display: flex;
+    align-items: center;
     gap: 1rem;
     padding: 1rem;
     background-color: var(--background-light);

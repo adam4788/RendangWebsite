@@ -74,8 +74,9 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-snap-type: y proximity;
+    scroll-snap-type: y mandatory;
     overflow-y: scroll;
+    height: 100%;
 }
 
 * {
@@ -90,11 +91,33 @@ body {
     color: var(--primary-color);
     overflow-x: hidden;
     padding-top: var(--total-offset);
+    min-height: 100%;
+    position: relative;
 }
 
+/* Section snapping */
 section {
     scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: calc(100vh - var(--total-offset));
     scroll-margin-top: var(--total-offset);
+    position: relative;
+    padding: 4rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Ensure each section fills the viewport properly */
+.hero {
+    min-height: calc(100vh - var(--total-offset));
+    margin-top: calc(-1 * var(--total-offset));
+    padding-top: var(--total-offset);
+}
+
+.about,
+.menu,
+.order {
     min-height: calc(100vh - var(--total-offset));
 }
 
@@ -1110,8 +1133,7 @@ section.visible {
 
 .lookup-results {
     display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    flex-direction: column; gap: 2rem;
 }
 
 .order-card {

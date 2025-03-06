@@ -344,25 +344,69 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Smooth scrolling for anchor links
+    // Enhanced smooth scrolling with snap
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             if (this.getAttribute('href') === '#') return;
 
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
+
             if (target) {
+                // Close mobile menu if open
+                navbarMenu.classList.remove('active');
+
+                // Smooth scroll to target
                 target.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
-                // Close mobile menu if open
-                navbarMenu.classList.remove('active');
             }
         });
     });
+
+    // Prevent partial scrolling
+    let isScrolling;
+    let lastScrollTop = window.pageYOffset;
+
+    window.addEventListener('scroll', function() {
+        clearTimeout(isScrolling);
+
+        isScrolling = setTimeout(function() {
+            // Get all sections
+            const sections = document.querySelectorAll('section');
+            const currentScrollPos = window.pageYOffset;
+            const windowHeight = window.innerHeight;
+            const scrollDirection = currentScrollTop > lastScrollTop ? 'down' : 'up';
+
+            // Find the nearest section
+            let closestSection = null;
+            let closestDistance = Infinity;
+
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const distance = Math.abs(rect.top);
+
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestSection = section;
+                }
+            });
+
+            // Scroll to the nearest section
+            if (closestSection) {
+                closestSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+
+            lastScrollTop = currentScrollPos;
+        }, 50); // Small delay to ensure smooth operation
+    });
+
     // Scroll reveal animation for sections
-    const sections = document.querySelectorAll('section');
+    const revealSections = document.querySelectorAll('section');
     const revealSection = function(entries, observer) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -377,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
         threshold: 0.15
     });
 
-    sections.forEach(section => {
+    revealSections.forEach(section => {
         section.classList.remove('visible'); // Ensure sections start hidden
         sectionObserver.observe(section);
     });

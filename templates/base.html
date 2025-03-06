@@ -22,7 +22,9 @@
 
     <nav class="navbar">
         <div class="navbar-brand">
-            <a href="/">Rendang and Refresh</a>
+            <a href="/">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Rendang and Refresh" class="navbar-logo">
+            </a>
         </div>
         <button class="navbar-toggle">
             <i class="fas fa-bars"></i>
@@ -67,7 +69,7 @@
         <div class="footer-content">
             <div class="footer-column">
                 <div class="footer-logo">
-                    <h3>Rendang and Refresh</h3>
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Rendang and Refresh" class="footer-logo-img">
                     <p>Experience authentic Indonesian cuisine with a modern twist.</p>
                 </div>
                 <div class="footer-social">

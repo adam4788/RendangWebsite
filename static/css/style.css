@@ -1310,3 +1310,46 @@ section.visible {
 .add-to-cart-btn {
     display: none;
 }
+
+/* Add these styles to handle the logo */
+.navbar-logo {
+    height: 50px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.navbar-brand a:hover .navbar-logo {
+    transform: scale(1.05);
+}
+
+.footer-logo {
+    margin-bottom: 1.5rem;
+}
+
+.footer-logo-img {
+    height: 60px;
+    width: auto;
+    margin-bottom: 1rem;
+    filter: brightness(0) invert(1); /* Make logo white in footer */
+}
+
+@media (max-width: 768px) {
+    .navbar-logo {
+        height: 40px;
+    }
+
+    .footer-logo-img {
+        height: 50px;
+    }
+}

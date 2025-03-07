@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function adjustNavbarPosition(bannerVisible) {
         if (navbar) {
+            if (bannerVisible) {
+                navbar.style.top = `${bannerHeight}px`;
+                document.body.style.paddingTop = `${bannerHeight + 60}px`;
+            } else {
+                navbar.style.top = '0';
+                document.body.style.paddingTop = '60px';
+            }
             if (!bannerVisible) {
                 navbar.style.top = '0';
                 document.body.style.paddingTop = `${navbar.offsetHeight}px`;

@@ -344,7 +344,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Navigation toggle and scroll behavior
-    const navbar = document.querySelector('.navbar');
     const navbarToggle = document.querySelector('.navbar-toggle');
     const navbarMenu = document.querySelector('.navbar-menu');
 

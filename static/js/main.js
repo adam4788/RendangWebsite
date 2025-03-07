@@ -18,13 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 navbar.style.top = '0';
                 document.body.style.paddingTop = '60px';
             }
-            if (!bannerVisible) {
-                navbar.style.top = '0';
-                document.body.style.paddingTop = `${navbar.offsetHeight}px`;
-            } else {
-                navbar.style.top = `${bannerHeight}px`;
-                document.body.style.paddingTop = `${bannerHeight + navbar.offsetHeight}px`;
-            }
         }
     }
 

@@ -12,6 +12,7 @@
     justify-content: center;
     align-items: center;
     transition: transform 0.3s ease;
+    height: var(--banner-height);
 }
 
 .announcement-banner.hidden {
@@ -110,13 +111,13 @@ section {
     backdrop-filter: blur(10px);
     position: fixed;
     width: 100%;
-    top: var(--banner-height); /* Adjust for banner height */
+    top: var(--banner-height); /* Default position with banner */
     z-index: 1000;
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease, top 0.3s ease;
 }
 
 .navbar.scrolled {

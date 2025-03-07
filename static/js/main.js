@@ -2,6 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Announcement banner functionality
     const announcementBanner = document.querySelector('.announcement-banner');
     const closeAnnouncement = document.querySelector('.close-announcement');
+    const navbar = document.querySelector('.navbar');
+    const bannerHeight = announcementBanner ? announcementBanner.offsetHeight : 0;
+
+    function adjustNavbarPosition(bannerVisible) {
+        if (navbar) {
+            if (!bannerVisible) {
+                navbar.style.top = '0';
+                document.body.style.paddingTop = `${navbar.offsetHeight}px`;
+            } else {
+                navbar.style.top = `${bannerHeight}px`;
+                document.body.style.paddingTop = `${bannerHeight + navbar.offsetHeight}px`;
+            }
+        }
+    }
 
     if (closeAnnouncement && announcementBanner) {
         // Check if user has previously closed the banner
@@ -9,12 +23,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (isAnnouncementClosed) {
             announcementBanner.classList.add('hidden');
+            adjustNavbarPosition(false);
+        } else {
+            adjustNavbarPosition(true);
         }
 
         closeAnnouncement.addEventListener('click', () => {
             announcementBanner.classList.add('hidden');
             // Store user preference
             localStorage.setItem('announcementClosed', 'true');
+            adjustNavbarPosition(false);
         });
     }
 

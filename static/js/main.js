@@ -1,209 +1,426 @@
-
-// Main JavaScript for Rendang and Refresh
-
 document.addEventListener('DOMContentLoaded', function() {
     // Announcement banner functionality
     const announcementBanner = document.querySelector('.announcement-banner');
     const closeAnnouncement = document.querySelector('.close-announcement');
-    const navbar = document.querySelector('.navbar');
-    // Use CSS variable for consistency
-    const bannerHeight = 45; // Matching --banner-height CSS variable
-
-    function adjustNavbarPosition(bannerVisible) {
-        if (navbar) {
-            if (bannerVisible) {
-                navbar.style.top = `${bannerHeight}px`;
-                document.body.style.paddingTop = `${bannerHeight + 60}px`;
-            } else {
-                navbar.style.top = '0';
-                document.body.style.paddingTop = '60px';
-            }
-        }
-    }
 
     if (closeAnnouncement && announcementBanner) {
         // Check if user has previously closed the banner
         const isAnnouncementClosed = localStorage.getItem('announcementClosed');
 
-        if (isAnnouncementClosed === 'true') {
+        if (isAnnouncementClosed) {
             announcementBanner.classList.add('hidden');
-            adjustNavbarPosition(false);
-        } else {
-            announcementBanner.classList.remove('hidden');
-            adjustNavbarPosition(true);
         }
 
         closeAnnouncement.addEventListener('click', () => {
             announcementBanner.classList.add('hidden');
             // Store user preference
             localStorage.setItem('announcementClosed', 'true');
-            adjustNavbarPosition(false);
         });
     }
 
-    // Navigation toggle and scroll behavior
-    const navbarToggle = document.querySelector('.navbar-toggle');
-    const navbarMenu = document.querySelector('.navbar-menu');
+    // Cart state
+    let cart = {
+        items: {},
+        total: 0
+    };
 
-    // Toggle mobile menu
-    if (navbarToggle && navbarMenu) {
-        navbarToggle.addEventListener('click', () => {
-            navbarMenu.classList.toggle('active');
-        });
-    }
+    function updateQuantity(id, delta) {
+        const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+        const plusBtn = menuItem.querySelector('.plus');
+        const name = plusBtn.dataset.name;
+        const price = parseFloat(plusBtn.dataset.price);
 
-    // Scroll behavior
-    window.addEventListener('scroll', () => {
-        if (navbar) {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
+        if (!cart.items[id] && delta > 0) {
+            // Adding item for the first time
+            cart.items[id] = {
+                name: name,
+                price: price,
+                quantity: 0
+            };
+        }
+
+        if (cart.items[id]) {
+            const newQuantity = (cart.items[id].quantity || 0) + delta;
+
+            if (newQuantity <= 0) {
+                delete cart.items[id];
             } else {
-                navbar.classList.remove('scrolled');
+                cart.items[id].quantity = newQuantity;
             }
+
+            updateMenuItemQuantity(id, newQuantity);
+            updateCartTotal();
+            updateCartDisplay();
+        }
+    }
+
+    function updateMenuItemQuantity(id, quantity = 0) {
+        const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+        const quantityDisplay = menuItem.querySelector('.quantity');
+        const minusBtn = menuItem.querySelector('.minus');
+
+        if (quantityDisplay) {
+            quantityDisplay.textContent = quantity;
+
+            // Update minus button state
+            if (quantity > 0) {
+                minusBtn.style.opacity = '1';
+            } else {
+                minusBtn.style.opacity = '0.5';
+            }
+        }
+    }
+
+    // Initialize quantity controls
+    document.querySelectorAll('.menu-item').forEach(item => {
+        const id = item.dataset.id;
+        const quantityControls = item.querySelector('.quantity-controls');
+
+        if (quantityControls) {
+            const minusBtn = quantityControls.querySelector('.minus');
+            const plusBtn = quantityControls.querySelector('.plus');
+
+            minusBtn.addEventListener('click', () => updateQuantity(id, -1));
+            plusBtn.addEventListener('click', () => updateQuantity(id, 1));
+
+            // Initialize quantity display
+            updateMenuItemQuantity(id, 0);
         }
     });
 
-    // Menu and order functionality
-    const menuItems = document.querySelectorAll('.menu-item');
-    const orderDetailsTextarea = document.getElementById('order_details');
+
+    // Cart DOM elements
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartSidebar = document.querySelector('.cart-sidebar');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    const closeCart = document.querySelector('.close-cart');
+    const cartItemsContainer = document.querySelector('.cart-items');
+    const cartCount = document.querySelector('.cart-count');
+    const totalAmount = document.querySelector('.total-amount');
+    const checkoutButton = document.querySelector('.checkout-button');
+
+    // Toggle cart sidebar
+    function toggleCart() {
+        cartSidebar.classList.toggle('active');
+        cartOverlay.classList.toggle('active');
+    }
+
+    cartToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleCart();
+    });
+
+    closeCart.addEventListener('click', toggleCart);
+    cartOverlay.addEventListener('click', toggleCart);
+
+    // Add to cart functionality
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const price = parseFloat(this.dataset.price);
+
+            addToCart(id, name, price);
+            updateCartDisplay();
+
+            // Show cart after adding item
+            if (!cartSidebar.classList.contains('active')) {
+                toggleCart();
+            }
+        });
+    });
+
+    function addToCart(id, name, price) {
+        if (cart.items[id]) {
+            cart.items[id].quantity++;
+        } else {
+            cart.items[id] = {
+                name: name,
+                price: price,
+                quantity: 1
+            };
+
+            // Show quantity controls
+            const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+            const addButton = menuItem.querySelector('.add-to-cart-btn');
+            const quantityControls = menuItem.querySelector('.quantity-controls');
+
+            addButton.classList.add('hidden');
+            quantityControls.classList.remove('hidden');
+        }
+
+        // Update quantity display in menu
+        updateMenuItemQuantity(id);
+        updateCartTotal();
+    }
+
+    function removeFromCart(id) {
+        if (cart.items[id]) {
+            delete cart.items[id];
+            updateCartTotal();
+            updateCartDisplay();
+        }
+    }
+
+
+    function updateCartTotal() {
+        cart.total = Object.values(cart.items).reduce((sum, item) => {
+            return sum + (item.price * item.quantity);
+        }, 0);
+
+        // Update display
+        totalAmount.textContent = `$${cart.total.toFixed(2)}`;
+        cartCount.textContent = Object.values(cart.items).reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function updateCartDisplay() {
+        cartItemsContainer.innerHTML = '';
+
+        for (const [id, item] of Object.entries(cart.items)) {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.name}</div>
+                    <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn minus" data-id="${id}">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn plus" data-id="${id}">+</button>
+                        <button class="quantity-btn remove" data-id="${id}">×</button>
+                    </div>
+                </div>
+            `;
+            cartItemsContainer.appendChild(cartItem);
+
+            // Add event listeners to quantity buttons
+            cartItem.querySelector('.minus').addEventListener('click', () => updateQuantity(id, -1));
+            cartItem.querySelector('.plus').addEventListener('click', () => updateQuantity(id, 1));
+            cartItem.querySelector('.remove').addEventListener('click', () => removeFromCart(id));
+        }
+    }
+
+    // Checkout button handler
+    checkoutButton.addEventListener('click', function() {
+        if (Object.keys(cart.items).length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+
+        // Auto-fill order details in the order form
+        const orderDetails = document.getElementById('order_details');
+        if (orderDetails) {
+            const cartSummary = Object.values(cart.items)
+                .map(item => `${item.name} x${item.quantity} ($${(item.price * item.quantity).toFixed(2)})`)
+                .join('\n');
+            orderDetails.value = cartSummary + `\n\nTotal: $${cart.total.toFixed(2)}`;
+        }
+
+        // Scroll to order form
+        document.querySelector('#order').scrollIntoView({ behavior: 'smooth' });
+        toggleCart();
+    });
+
+    //Form validation and submission code from edited snippet
     const orderForm = document.getElementById('order-form');
     const orderMessage = document.getElementById('order-message');
-    
-    // Track selected items
-    let selectedItems = {};
+    const formInputs = document.querySelectorAll('.form-group input, .form-group textarea');
 
-    // Handle quantity changes
-    menuItems.forEach(item => {
-        const plusBtn = item.querySelector('.plus');
-        const minusBtn = item.querySelector('.minus');
-        const quantityElement = item.querySelector('.quantity');
-        
-        if (plusBtn && minusBtn && quantityElement) {
-            const itemId = plusBtn.getAttribute('data-id');
-            const itemName = plusBtn.getAttribute('data-name');
-            const itemPrice = parseFloat(plusBtn.getAttribute('data-price'));
-            
-            plusBtn.addEventListener('click', () => {
-                let quantity = parseInt(quantityElement.textContent);
-                quantity++;
-                quantityElement.textContent = quantity;
-                
-                // Update selected items
-                selectedItems[itemId] = {
-                    name: itemName,
-                    price: itemPrice,
-                    quantity: quantity
-                };
-                
-                updateOrderDetails();
-            });
-            
-            minusBtn.addEventListener('click', () => {
-                let quantity = parseInt(quantityElement.textContent);
-                if (quantity > 0) {
-                    quantity--;
-                    quantityElement.textContent = quantity;
-                    
-                    if (quantity === 0) {
-                        delete selectedItems[itemId];
-                    } else {
-                        selectedItems[itemId].quantity = quantity;
-                    }
-                    
-                    updateOrderDetails();
-                }
-            });
-        }
+    // Add focus effects to form inputs
+    formInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+            // Validate on blur
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('error');
+                showInputError(this);
+            } else {
+                this.classList.remove('error');
+                hideInputError(this);
+            }
+        });
     });
-    
-    // Update order details textarea
-    function updateOrderDetails() {
-        if (orderDetailsTextarea) {
-            let orderText = '';
-            let total = 0;
-            
-            for (const itemId in selectedItems) {
-                const item = selectedItems[itemId];
-                const itemTotal = item.price * item.quantity;
-                orderText += `${item.name} x${item.quantity} - $${itemTotal.toFixed(2)}\n`;
-                total += itemTotal;
-            }
-            
-            if (orderText) {
-                orderText += `\nTotal: $${total.toFixed(2)}`;
-            }
-            
-            orderDetailsTextarea.value = orderText;
+
+    // Form validation feedback
+    function showInputError(input) {
+        const errorDiv = input.parentElement.querySelector('.error-message');
+        if (!errorDiv) {
+            const div = document.createElement('div');
+            div.className = 'error-message';
+            div.textContent = `Please enter your ${input.placeholder || 'value'}`;
+            input.parentElement.appendChild(div);
         }
     }
-    
-    // Handle order submission
+
+    function hideInputError(input) {
+        const errorDiv = input.parentElement.querySelector('.error-message');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+
+    // Order form submission with enhanced feedback
     if (orderForm) {
         orderForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            // Check if there are items in the order
-            if (Object.keys(selectedItems).length === 0) {
-                orderMessage.textContent = 'Please select at least one item to order.';
-                orderMessage.classList.add('error');
+
+            // Validate all required fields
+            let isValid = true;
+            formInputs.forEach(input => {
+                if (input.hasAttribute('required') && !input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('error');
+                    showInputError(input);
+                }
+            });
+
+            if (!isValid) {
+                orderMessage.textContent = 'Please fill in all required fields';
+                orderMessage.className = 'order-message error';
                 return;
             }
-            
-            // Get form data
+
+            // Show loading state
+            const submitButton = orderForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+
+            // Add loading animation
+            submitButton.classList.add('loading');
+
+            // Collect form data
             const formData = new FormData(orderForm);
-            
-            // Submit order
+
+            // Submit the form
             fetch('/submit_order', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
+                orderMessage.textContent = data.message;
+                orderMessage.className = 'order-message ' + (data.success ? 'success' : 'error');
+
                 if (data.success) {
-                    orderMessage.textContent = data.message;
-                    orderMessage.classList.remove('error');
-                    orderMessage.classList.add('success');
-                    
-                    // Reset form and selected items
                     orderForm.reset();
-                    selectedItems = {};
-                    menuItems.forEach(item => {
-                        const quantityElement = item.querySelector('.quantity');
-                        if (quantityElement) {
-                            quantityElement.textContent = '0';
-                        }
-                    });
-                } else {
-                    orderMessage.textContent = data.message;
-                    orderMessage.classList.add('error');
-                    orderMessage.classList.remove('success');
+                    // Add success animation
+                    submitButton.classList.add('success');
                 }
             })
             .catch(error => {
                 orderMessage.textContent = 'An error occurred. Please try again.';
-                orderMessage.classList.add('error');
-                orderMessage.classList.remove('success');
-                console.error('Error:', error);
+                orderMessage.className = 'order-message error';
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
             });
         });
     }
-    
-    // Order lookup functionality
+
+    // Navigation toggle and scroll behavior
+    const navbar = document.querySelector('.navbar');
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+
+    // Toggle mobile menu
+    navbarToggle.addEventListener('click', function() {
+        navbarMenu.classList.toggle('active');
+    });
+
+    // Navbar scroll behavior
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            if (this.getAttribute('href') === '#') return;
+
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                // Close mobile menu if open
+                navbarMenu.classList.remove('active');
+            }
+        });
+    });
+    // Scroll reveal animation for sections
+    const sections = document.querySelectorAll('section');
+    const revealSection = function(entries, observer) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const sectionObserver = new IntersectionObserver(revealSection, {
+        root: null,
+        threshold: 0.15
+    });
+
+    sections.forEach(section => {
+        section.classList.remove('visible'); // Ensure sections start hidden
+        sectionObserver.observe(section);
+    });
+
+
+    // Menu item hover effect
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
     const lookupForm = document.getElementById('lookup-form');
     const lookupResults = document.getElementById('lookup-results');
     const lookupMessage = document.getElementById('lookup-message');
-    
-    if (lookupForm && lookupResults && lookupMessage) {
+
+    if (lookupForm) {
         lookupForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const searchType = document.getElementById('search_type').value;
             const searchValue = document.getElementById('search_value').value;
-            
+
+            // Show loading state
+            const submitButton = lookupForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Searching...';
+            submitButton.disabled = true;
+            submitButton.classList.add('loading');
+
+            // Clear previous results and messages
+            lookupResults.innerHTML = '';
+            lookupMessage.className = 'lookup-message';
+            lookupMessage.textContent = '';
+
             fetch('/search_order', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     search_type: searchType,
@@ -213,45 +430,70 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Clear previous results
-                    lookupResults.innerHTML = '';
-                    lookupMessage.textContent = '';
-                    lookupMessage.className = 'lookup-message';
-                    
-                    // Display orders
                     data.orders.forEach(order => {
                         const orderCard = document.createElement('div');
                         orderCard.className = 'order-card';
-                        
                         orderCard.innerHTML = `
-                            <h3>Order from ${order.name}</h3>
-                            <p class="order-date">Date: ${order.timestamp}</p>
-                            <div class="order-details">
-                                <p><strong>Email:</strong> ${order.email}</p>
-                                <p><strong>Phone:</strong> ${order.phone}</p>
-                                <p><strong>Order Details:</strong></p>
-                                <pre>${order.order_details}</pre>
-                                ${order.special_instructions ? `
-                                <p><strong>Special Instructions:</strong></p>
-                                <pre>${order.special_instructions}</pre>
-                                ` : ''}
+                            <div class="order-header">
+                                <h3>Order Details</h3>
+                                <span class="order-date">${order.timestamp}</span>
                             </div>
+                            <div class="order-details">
+                                <strong>Items:</strong><br>
+                                ${order.order_details.split('\n').join('<br>')}
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-meta-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>${order.name}</span>
+                                </div>
+                                <div class="order-meta-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>${order.email}</span>
+                                </div>
+                                <div class="order-meta-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>${order.phone}</span>
+                                </div>
+                            </div>
+                            ${order.special_instructions ? `
+                                <div class="special-instructions">
+                                    <strong>Special Instructions:</strong><br>
+                                    ${order.special_instructions}
+                                </div>
+                            ` : ''}
                         `;
-                        
                         lookupResults.appendChild(orderCard);
                     });
                 } else {
-                    lookupResults.innerHTML = '';
+                    lookupMessage.className = 'lookup-message error';
                     lookupMessage.textContent = data.message;
-                    lookupMessage.classList.add('error');
                 }
             })
             .catch(error => {
-                lookupResults.innerHTML = '';
-                lookupMessage.textContent = 'An error occurred. Please try again.';
-                lookupMessage.classList.add('error');
-                console.error('Error:', error);
+                lookupMessage.className = 'lookup-message error';
+                lookupMessage.textContent = 'An error occurred while searching for your order';
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
             });
         });
     }
+
+    // Add event listeners for quantity controls in menu items (This part was already present, but is now integrated with the new updateQuantity and updateMenuItemQuantity functions)
+    document.querySelectorAll('.menu-item').forEach(item => {
+        const id = item.dataset.id;
+        const quantityControls = item.querySelector('.quantity-controls');
+
+        if (quantityControls) {
+            const minusBtn = quantityControls.querySelector('.minus');
+            const plusBtn = quantityControls.querySelector('.plus');
+
+            minusBtn.addEventListener('click', () => updateQuantity(id, -1));
+            plusBtn.addEventListener('click', () => updateQuantity(id, 1));
+        }
+    });
 });

@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const announcementBanner = document.querySelector('.announcement-banner');
     const closeAnnouncement = document.querySelector('.close-announcement');
     const navbar = document.querySelector('.navbar');
-    const bannerHeight = announcementBanner ? announcementBanner.offsetHeight : 0;
+    // Use CSS variable for consistency
+    const bannerHeight = 45; // Matching --banner-height CSS variable
 
     function adjustNavbarPosition(bannerVisible) {
         if (navbar) {

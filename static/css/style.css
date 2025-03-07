@@ -1,4 +1,9 @@
 /* Add at the beginning of the file, before other styles */
+:root {
+    --banner-height: 45px;
+    --total-offset: calc(var(--banner-height) + 60px);
+}
+
 .announcement-banner {
     background-color: var(--accent-color);
     color: white;
@@ -23,7 +28,7 @@
 /* Ensure page content is visible */
 body {
     padding-top: 60px; /* Adjust based on your navbar height */
-    transform: translateY(-100%);
+    margin-top: var(--banner-height);
 }
 
 .announcement-content {

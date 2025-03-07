@@ -1,7 +1,12 @@
 /* Add at the beginning of the file, before other styles */
+:root {
+    --banner-height: 45px;
+    --total-offset: calc(var(--banner-height) + 60px);
+}
 .announcement-banner {
     background-color: var(--accent-color);
     color: white;
+    display: flex;
     padding: 0.75rem 2rem;
     position: fixed;
     top: 0;

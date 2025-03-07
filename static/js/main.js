@@ -4,11 +4,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeAnnouncement = document.querySelector('.close-announcement');
 
     if (closeAnnouncement && announcementBanner) {
+        // Reset banner state to ensure visibility
+        localStorage.removeItem('announcementClosed');
+        
         // Check if user has previously closed the banner
         const isAnnouncementClosed = localStorage.getItem('announcementClosed');
 
-        if (isAnnouncementClosed) {
+        if (isAnnouncementClosed === 'true') {
             announcementBanner.classList.add('hidden');
+        } else {
+            announcementBanner.classList.remove('hidden');
         }
 
         closeAnnouncement.addEventListener('click', () => {
@@ -326,7 +331,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Navigation toggle and scroll behavior
-    const navbar = document.querySelector('.navbar');
     const navbarToggle = document.querySelector('.navbar-toggle');
     const navbarMenu = document.querySelector('.navbar-menu');
 

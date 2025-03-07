@@ -9,12 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (isAnnouncementClosed) {
             announcementBanner.classList.add('hidden');
-            document.body.classList.add('banner-hidden');
         }
 
         closeAnnouncement.addEventListener('click', () => {
             announcementBanner.classList.add('hidden');
-            document.body.classList.add('banner-hidden');
             // Store user preference
             localStorage.setItem('announcementClosed', 'true');
         });

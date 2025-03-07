@@ -182,6 +182,38 @@ section {
     width: 100%;
 }
 
+/* Navigation styles update */
+.navbar-menu li a.nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    opacity: 0.9;
+}
+
+.navbar-menu li a.nav-link:hover,
+.navbar-menu li a.nav-link.active {
+    opacity: 1;
+}
+
+.navbar-menu li a.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: var(--accent-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar-menu li a.nav-link:hover::after,
+.navbar-menu li a.nav-link.active::after {
+    width: 100%;
+}
+
 /* Only show hamburger menu and adjust layout on mobile */
 @media (max-width: 992px) {
     .navbar-toggle {
@@ -1115,7 +1147,7 @@ section.visible {
     }
 }
 
-/* Lookup page styles */
+/*Lookup page styles */
 .lookup-page {
     padding: 8rem 0 5rem;
     background-color: var(--background-light);
@@ -1497,4 +1529,13 @@ section.visible {
     .about h2 {
         font-size: 1.8rem;
     }
+}
+
+/* Update anchor link behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+[id] {
+    scroll-margin-top: var(--total-offset);
 }

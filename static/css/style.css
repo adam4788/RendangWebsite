@@ -1142,7 +1142,7 @@ section.visible {
 }
 
 .event-highlights ul {
-    list-style: none;
+    liststyle: none;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

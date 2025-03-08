@@ -3,6 +3,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const announcementBanner = document.querySelector('.announcement-banner');
     const closeAnnouncement = document.querySelector('.close-announcement');
 
+    function adjustNavbarPosition() {
+        const navbar = document.querySelector('.navbar');
+        if (navbar && announcementBanner) {
+            if (announcementBanner.classList.contains('hidden')) {
+                navbar.style.top = '0';
+                document.body.style.paddingTop = navbar.offsetHeight + 'px';
+            } else {
+                navbar.style.top = announcementBanner.offsetHeight + 'px';
+                document.body.style.paddingTop = (announcementBanner.offsetHeight + navbar.offsetHeight) + 'px';
+            }
+        }
+    }
+
     if (closeAnnouncement && announcementBanner) {
         // Reset banner state to ensure visibility
         localStorage.removeItem('announcementClosed');
@@ -20,7 +33,13 @@ document.addEventListener('DOMContentLoaded', function() {
             announcementBanner.classList.add('hidden');
             // Store user preference
             localStorage.setItem('announcementClosed', 'true');
+            // Adjust navbar position when banner is closed
+            adjustNavbarPosition();
         });
+        
+        // Initial adjustment
+        window.addEventListener('load', adjustNavbarPosition);
+        window.addEventListener('resize', adjustNavbarPosition);
     }
 
     // Cart state

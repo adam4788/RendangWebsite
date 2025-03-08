@@ -114,6 +114,22 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         toggleCart();
     });
+    
+    // Menu checkout button
+    const menuCheckoutButton = document.getElementById('menu-checkout');
+    if (menuCheckoutButton) {
+        menuCheckoutButton.addEventListener('click', function() {
+            if (Object.keys(cart.items).length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            // Show cart sidebar
+            if (!cartSidebar.classList.contains('active')) {
+                toggleCart();
+            }
+        });
+    }
 
     closeCart.addEventListener('click', toggleCart);
     cartOverlay.addEventListener('click', toggleCart);

@@ -3,6 +3,12 @@
     --banner-height: 45px;
     --total-offset: calc(var(--banner-height) + 60px);
 }
+
+body {
+    margin: 0;
+    padding-top: var(--navbar-height, 60px);
+    transition: padding-top 0.3s ease;
+}
 .announcement-banner {
     background-color: var(--accent-color);
     color: white;
@@ -1192,7 +1198,7 @@ section.visible {
 
 /*Lookup page styles */
 .lookup-page {
-    padding: 8rem 0 5rem;
+    padding: 5rem 0 5rem;
     background-color: var(--background-light);
 }
 

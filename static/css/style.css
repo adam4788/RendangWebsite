@@ -1433,10 +1433,8 @@ section.visible {
     width: 70px;
     transition: transform 0.3s ease;
     padding: 0.5rem;
-    background-color: white;
-    border-radius: 50%;
+    background-color: transparent;
     object-fit: contain;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
@@ -1464,8 +1462,7 @@ section.visible {
     height: 80px;
     width: 80px;
     margin-bottom: 1rem;
-    background-color: white;
-    border-radius: 50%;
+    background-color: transparent;
     padding: 0.5rem;
     object-fit: contain;
 }

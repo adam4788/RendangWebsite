@@ -1435,6 +1435,7 @@ section.visible {
     padding: 0.5rem;
     background-color: transparent;
     object-fit: contain;
+    border-radius: 50%;
 }
 
 .navbar-brand {
@@ -1465,6 +1466,7 @@ section.visible {
     background-color: transparent;
     padding: 0.5rem;
     object-fit: contain;
+    border-radius: 50%;
 }
 
 @media (max-width: 768px) {

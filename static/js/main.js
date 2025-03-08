@@ -341,9 +341,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Navbar scroll behavior
     window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
+        const navbar = document.querySelector('.navbar');
+        if (navbar && window.scrollY > 50) {
             navbar.classList.add('scrolled');
-        } else {
+        } else if (navbar) {
             navbar.classList.remove('scrolled');
         }
     });
@@ -487,17 +488,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add event listeners for quantity controls in menu items (This part was already present, but is now integrated with the new updateQuantity and updateMenuItemQuantity functions)
-    document.querySelectorAll('.menu-item').forEach(item => {
-        const id = item.dataset.id;
-        const quantityControls = item.querySelector('.quantity-controls');
-
-        if (quantityControls) {
-            const minusBtn = quantityControls.querySelector('.minus');
-            const plusBtn = quantityControls.querySelector('.plus');
-
-            minusBtn.addEventListener('click', () => updateQuantity(id, -1));
-            plusBtn.addEventListener('click', () => updateQuantity(id, 1));
-        }
-    });
+    // Event listeners for quantity controls are already added above
 });

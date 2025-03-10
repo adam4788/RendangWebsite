@@ -1,34 +1,47 @@
 {% extends "base.html" %}
 
+{% block title %}Events - Pasar Permias at Rendang and Refresh{% endblock %}
+
+{% block og_title %}Pasar Permias Event - Rendang and Refresh{% endblock %}
+{% block og_description %}Join us at Pasar Permias on April 5th at City Harvest Indonesia Church for authentic Indonesian cuisine and cultural performances.{% endblock %}
+
 {% block content %}
 <section class="events-page">
     <div class="container">
         <h1>Upcoming Events</h1>
 
-        <div class="featured-event">
+        <div class="featured-event" itemscope itemtype="https://schema.org/Event">
             <div class="event-content">
-                <h2>Pasar Permias Event</h2>
+                <h2 itemprop="name">Pasar Permias Event</h2>
                 <div class="event-details">
                     <div class="event-detail">
                         <i class="fas fa-calendar"></i>
-                        <span>April 5th, 2024</span>
+                        <span itemprop="startDate" content="2024-04-05T11:00">April 5th, 2024</span>
                     </div>
                     <div class="event-detail">
                         <i class="fas fa-clock"></i>
-                        <span>11:00 AM - 3:00 PM</span>
+                        <span><time itemprop="startTime">11:00 AM</time> - <time itemprop="endTime">3:00 PM</time></span>
                     </div>
                     <div class="event-detail">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>
-                            City Harvest Indonesia Church
-                            2617 N 32nd St Phoenix, AZ 85008
-                            <a href="https://maps.google.com/?q=2617+N+32nd+St+Phoenix+AZ+85008" target="_blank" class="location-link">
+                        <span itemprop="location" itemscope itemtype="https://schema.org/Place">
+                            <span itemprop="name">City Harvest Indonesia Church</span>
+                            <span itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                                <span itemprop="streetAddress">2617 N 32nd St</span>
+                                <span itemprop="addressLocality">Phoenix</span>,
+                                <span itemprop="addressRegion">AZ</span>
+                                <span itemprop="postalCode">85008</span>
+                            </span>
+                            <a href="https://maps.google.com/?q=2617+N+32nd+St+Phoenix+AZ+85008" 
+                               target="_blank" 
+                               class="location-link" 
+                               rel="noopener noreferrer">
                                 <i class="fas fa-external-link-alt"></i> View on Maps
                             </a>
                         </span>
                     </div>
                 </div>
-                <p class="event-description">
+                <p class="event-description" itemprop="description">
                     Join us at the upcoming Pasar Permias event where we'll be serving our signature rendang dishes and refreshing beverages. Experience the authentic taste of Indonesian cuisine and enjoy the festive atmosphere!
                 </p>
                 <div class="event-highlights">

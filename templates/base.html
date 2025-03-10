@@ -3,12 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Rendang and Refresh{% endblock %}</title>
+    <meta name="description" content="Experience authentic Indonesian rendang and refreshing beverages at Rendang and Refresh. Join us for our special events including Pasar Permias on April 5th.">
+    <meta name="keywords" content="Indonesian food, rendang, Phoenix restaurant, Pasar Permias, City Harvest Indonesia Church, authentic Indonesian cuisine">
+    <meta name="author" content="Rendang and Refresh">
+    <meta property="og:title" content="{% block og_title %}Rendang and Refresh - Authentic Indonesian Cuisine{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Experience authentic Indonesian rendang paired with refreshing beverages. Join us for special events and authentic dining experiences.{% endblock %}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo.png', _external=True) }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>{% block title %}Rendang and Refresh - Authentic Indonesian Cuisine{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Structured Data for Restaurant -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Rendang and Refresh",
+        "image": "{{ url_for('static', filename='images/logo.png', _external=True) }}",
+        "description": "Authentic Indonesian cuisine featuring traditional rendang dishes and refreshing beverages",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Phoenix",
+            "addressRegion": "AZ",
+            "addressCountry": "US"
+        },
+        "menu": "{{ url_for('home', _anchor='menu', _external=True) }}",
+        "servesCuisine": "Indonesian",
+        "priceRange": "$$",
+        "event": {
+            "@type": "Event",
+            "name": "Pasar Permias Event",
+            "startDate": "2024-04-05T11:00",
+            "endDate": "2024-04-05T15:00",
+            "location": {
+                "@type": "Place",
+                "name": "City Harvest Indonesia Church",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "2617 N 32nd St",
+                    "addressLocality": "Phoenix",
+                    "addressRegion": "AZ",
+                    "postalCode": "85008",
+                    "addressCountry": "US"
+                }
+            }
+        }
+    }
+    </script>
 </head>
 <body>
     <!-- Announcement Banner -->

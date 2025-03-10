@@ -1441,7 +1441,7 @@ section.visible {
 }
 
 .navbar-brand img {
-    height: 40px;
+    height: 60px; /* Increased from 40px */
     width: auto;
     transition: transform 0.3s ease;
 }
@@ -1455,37 +1455,9 @@ section.visible {
 }
 
 .footer-logo-img {
-    height: 100px;
-    width: 100px;
+    height: 80px; /* Increased from default */
+    width: auto;
     margin-bottom: 1rem;
-    background-color: transparent;
-    padding: 0.25rem;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-@media (max-width: 768px) {
-    .navbar-logo {
-        height: 80px;
-        width: 80px;
-    }
-
-    .footer-logo-img {
-        height: 90px;
-        width: 90px;
-    }
-}
-
-@media (max-width: 480px) {
-    .navbar-logo {
-        height: 70px;
-        width: 70px;
-    }
-
-    .footer-logo-img {
-        height: 80px;
-        width: 80px;
-    }
 }
 
 /* About Section */

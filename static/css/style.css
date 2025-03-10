@@ -1434,31 +1434,20 @@ section.visible {
 }
 
 /* Add these styles to handle the logo */
-.navbar-logo {
-    height: 90px;
-    width: 90px;
-    transition: transform 0.3s ease;
-    padding: 0.25rem;
-    background-color: transparent;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
 .navbar-brand {
     display: flex;
     align-items: center;
-    padding-right: 2rem;
+    gap: 1rem;
 }
 
-.navbar-brand a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
+.navbar-brand img {
+    height: 40px;
+    width: auto;
+    transition: transform 0.3s ease;
 }
 
-.navbar-brand a:hover .navbar-logo {
+.navbar-brand:hover img {
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .footer-logo {

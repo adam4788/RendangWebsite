@@ -194,7 +194,7 @@ def submit_order():
                 form.phone.data,
                 form.order_details.data,
                 form.special_instructions.data or '',
-                'FALSE'  # Default unchecked checkbox
+                False  # Use Python boolean False instead of string 'FALSE'
             ]
         ]
 
@@ -213,7 +213,7 @@ def submit_order():
             result = sheet.values().append(
                 spreadsheetId=SPREADSHEET_ID,
                 range=f"{SHEET_NAME}!A:G", # Updated range to include new column
-                valueInputOption='RAW',
+                valueInputOption='USER_ENTERED',  # Changed from RAW to USER_ENTERED
                 insertDataOption='INSERT_ROWS',
                 body={
                     "majorDimension": "ROWS",
@@ -229,7 +229,7 @@ def submit_order():
                 logger.error("Rate limit exceeded for Google Sheets API")
                 return jsonify({'success': False, 'message': 'Order system is busy, please try again in a few minutes'}), 429
             raise
-        
+
     except Exception as e:
         logger.error(f"Error submitting order: {str(e)}")
         logger.error(f"Error type: {type(e).__name__}")

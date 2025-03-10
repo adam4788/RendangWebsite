@@ -6,13 +6,24 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime
 from googleapiclient.errors import HttpError
+from flask_wtf import FlaskForm
+from wtforms import StringField, TextAreaField
+from wtforms.validators import DataRequired, Email, Length, ValidationError
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
+app.secret_key = os.environ.get("SESSION_SECRET")  # Removed fallback dev key
+
+# Form validation
+class OrderForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=50)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    phone = StringField('Phone', validators=[DataRequired(), Length(min=10, max=15)])
+    order_details = TextAreaField('Order Details', validators=[DataRequired()])
+    special_instructions = TextAreaField('Special Instructions')
 
 # Google Sheets configuration
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -139,22 +150,22 @@ def events():
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
     try:
-        data = request.form
-        name = data.get('name')
-        email = data.get('email')
-        phone = data.get('phone')
-        order_details = data.get('order_details')
-        special_instructions = data.get('special_instructions')
+        form = OrderForm(request.form)
+        if not form.validate():
+            return jsonify({
+                'success': False, 
+                'message': 'Invalid form data',
+                'errors': {field.name: field.errors for field in form if field.errors}
+            }), 400
 
-        logger.debug("Preparing order data for submission")
         order_data = [
             [
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                name,
-                email,
-                phone,
-                order_details,
-                special_instructions
+                form.name.data,
+                form.email.data,
+                form.phone.data,
+                form.order_details.data,
+                form.special_instructions.data or ''
             ]
         ]
 
@@ -167,21 +178,28 @@ def submit_order():
         if not setup_orders_sheet(service):
             return jsonify({'success': False, 'message': 'Error setting up order system'}), 500
 
-        logger.debug(f"Attempting to append data to spreadsheet: {SPREADSHEET_ID}")
-        sheet = service.spreadsheets()
-        result = sheet.values().append(
-            spreadsheetId=SPREADSHEET_ID,
-            range=f"{SHEET_NAME}!A:F",  # Using A:F range format instead of A1
-            valueInputOption='RAW',
-            insertDataOption='INSERT_ROWS',
-            body={
-                "majorDimension": "ROWS",
-                "values": order_data
-            }
-        ).execute()
+        try:
+            logger.debug(f"Attempting to append data to spreadsheet: {SPREADSHEET_ID}")
+            sheet = service.spreadsheets()
+            result = sheet.values().append(
+                spreadsheetId=SPREADSHEET_ID,
+                range=f"{SHEET_NAME}!A:F",
+                valueInputOption='RAW',
+                insertDataOption='INSERT_ROWS',
+                body={
+                    "majorDimension": "ROWS",
+                    "values": order_data
+                }
+            ).execute()
 
-        logger.debug("Successfully submitted order to Google Sheets")
-        return jsonify({'success': True, 'message': 'Order submitted successfully!'})
+            logger.debug("Successfully submitted order to Google Sheets")
+            return jsonify({'success': True, 'message': 'Order submitted successfully!'})
+
+        except HttpError as e:
+            if e.resp.status == 429:  # Rate limit exceeded
+                logger.error("Rate limit exceeded for Google Sheets API")
+                return jsonify({'success': False, 'message': 'Order system is busy, please try again in a few minutes'}), 429
+            raise
 
     except Exception as e:
         logger.error(f"Error submitting order: {str(e)}")

@@ -33,21 +33,21 @@ class OrderForm(FlaskForm):
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
 SHEET_NAME = 'Orders'
-HEADERS = [['Timestamp', 'Name', 'Email', 'Phone', 'Order Details', 'Special Instructions']]
+HEADERS = [['Timestamp', 'Name', 'Email', 'Phone', 'Order Details', 'Special Instructions', 'Completed']]
 
 def setup_orders_sheet(service):
     try:
         # Try to get sheet metadata first to check if the sheet exists
         spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
         sheet_exists = False
-        
+
         # Check if "Orders" sheet exists in the spreadsheet
         for sheet in spreadsheet.get('sheets', []):
             if sheet.get('properties', {}).get('title') == SHEET_NAME:
                 sheet_exists = True
                 logger.debug(f"Sheet '{SHEET_NAME}' already exists")
                 break
-                
+
         if not sheet_exists:
             # Sheet doesn't exist, create it
             logger.debug(f"Sheet '{SHEET_NAME}' doesn't exist, creating it")
@@ -64,19 +64,42 @@ def setup_orders_sheet(service):
                 spreadsheetId=SPREADSHEET_ID,
                 body=body
             ).execute()
-            
-            # Add headers
+
+            # Add headers and set checkbox for the last column
             service.spreadsheets().values().update(
                 spreadsheetId=SPREADSHEET_ID,
-                range=f"{SHEET_NAME}!A1:F1",
+                range=f"{SHEET_NAME}!A1:G1",
                 valueInputOption='RAW',
                 body={'values': HEADERS}
             ).execute()
-            
-            logger.debug(f"Created new sheet '{SHEET_NAME}' with headers")
-            
+
+            # Set checkbox data validation for the 'Completed' column
+            requests = [{
+                'setDataValidation': {
+                    'range': {
+                        'sheetId': spreadsheet.get('sheets')[0].get('properties').get('sheetId'),
+                        'startRowIndex': 1,  # Start from row after header
+                        'endRowIndex': 1000,  # Arbitrary large number for future rows
+                        'startColumnIndex': 6,  # G column (0-based)
+                        'endColumnIndex': 7,  # H column (exclusive)
+                    },
+                    'rule': {
+                        'condition': {
+                            'type': 'BOOLEAN'
+                        }
+                    }
+                }
+            }]
+
+            service.spreadsheets().batchUpdate(
+                spreadsheetId=SPREADSHEET_ID,
+                body={'requests': requests}
+            ).execute()
+
+            logger.debug(f"Created new sheet '{SHEET_NAME}' with headers and checkbox column")
+
         return True
-        
+
     except Exception as e:
         logger.error(f"Error setting up sheet: {str(e)}")
         return False
@@ -170,7 +193,8 @@ def submit_order():
                 form.email.data,
                 form.phone.data,
                 form.order_details.data,
-                form.special_instructions.data or ''
+                form.special_instructions.data or '',
+                'FALSE'  # Default unchecked checkbox
             ]
         ]
 
@@ -188,7 +212,7 @@ def submit_order():
             sheet = service.spreadsheets()
             result = sheet.values().append(
                 spreadsheetId=SPREADSHEET_ID,
-                range=f"{SHEET_NAME}!A:F",
+                range=f"{SHEET_NAME}!A:G", # Updated range to include new column
                 valueInputOption='RAW',
                 insertDataOption='INSERT_ROWS',
                 body={
@@ -205,7 +229,7 @@ def submit_order():
                 logger.error("Rate limit exceeded for Google Sheets API")
                 return jsonify({'success': False, 'message': 'Order system is busy, please try again in a few minutes'}), 429
             raise
-
+        
     except Exception as e:
         logger.error(f"Error submitting order: {str(e)}")
         logger.error(f"Error type: {type(e).__name__}")
@@ -232,7 +256,7 @@ def search_order():
         # Get all orders from the sheet
         result = service.spreadsheets().values().get(
             spreadsheetId=SPREADSHEET_ID,
-            range=f"{SHEET_NAME}!A:F"
+            range=f"{SHEET_NAME}!A:G"  # Updated range to include checkbox column
         ).execute()
 
         values = result.get('values', [])
@@ -254,7 +278,8 @@ def search_order():
                     'email': row[2],
                     'phone': row[3],
                     'order_details': row[4],
-                    'special_instructions': row[5] if len(row) > 5 else ''
+                    'special_instructions': row[5] if len(row) > 5 else '',
+                    'completed': row[6] if len(row) > 6 else 'FALSE'
                 }
                 matching_orders.append(order)
 

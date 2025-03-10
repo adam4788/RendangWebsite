@@ -526,6 +526,7 @@ dependencies = [
     { name = "google-auth-oauthlib" },
     { name = "gunicorn" },
     { name = "psycopg2-binary" },
+    { name = "wtforms" },
 ]
 
 [package.metadata]
@@ -540,6 +541,7 @@ requires-dist = [
     { name = "google-auth-oauthlib", specifier = ">=1.2.1" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
+    { name = "wtforms", specifier = ">=3.2.1" },
 ]
 
 [[package]]

@@ -1141,7 +1141,47 @@ section.visible {
 .event-content h2 {
     color: var(--primary-color);
     font-size: 2rem;
-    marginbottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Event location link styles */
+.location-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--accent-color);
+    text-decoration: none;
+    margin-left: 0.5rem;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.location-link i {
+    margin-left: 0.25rem;
+    font-size: 0.8em;
+}
+
+.location-link:hover {
+    color: #e55a2b;
+    transform: translateY(-1px);
+}
+
+/* Update event detail styles */
+.event-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.event-detail i {
+    color: var(--accent-color);
+    width: 20px;
+    margin-top: 0.25rem;
+}
+
+.event-detail span {
+    flex: 1;
+    line-height: 1.4;
 }
 
 .event-details {
@@ -1152,31 +1192,6 @@ section.visible {
     padding: 1.5rem;
     background-color: var(--background-light);
     border-radius: 8px;
-}
-
-.event-detail {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
-}
-
-.event-detail:hover {
-    transform: translateY(-2px);
-}
-
-.event-detail i {
-    color: var(--accent-color);
-    font-size: 1.25rem;
-}
-
-.event-detail span {
-    color: var(--primary-color);
-    font-weight: 500;
 }
 
 .event-description {
@@ -1200,7 +1215,7 @@ section.visible {
 }
 
 .event-highlights ul {
-    liststyle: none;
+    list-style: none;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

@@ -39,20 +39,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="menu-item" data-id="2">
-                <div class="menu-item-content">
-                    <h3>Chicken Rendang</h3>
-                    <p>Succulent chicken prepared in our signature rendang sauce</p>
-                    <span class="price">$16.99</span>
-                    <div class="item-controls">
-                        <div class="quantity-controls">
-                            <button class="quantity-btn minus" data-id="2">-</button>
-                            <span class="quantity">0</span>
-                            <button class="quantity-btn plus" data-id="2" data-name="Chicken Rendang" data-price="16.99">+</button>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
             <div class="menu-item" data-id="3">
                 <div class="menu-item-content">
                     <h3>Iced Lemon Tea</h3>
@@ -76,21 +62,26 @@
     <div class="container">
         <h2>Place Your Order</h2>
         <form id="order-form" class="order-form">
+            {{ form.csrf_token }}
             <div class="form-group">
                 <label for="name">Name</label>
-                <input type="text" id="name" name="name" required>
+                <input type="text" id="name" name="name" required minlength="2" maxlength="50">
+                <span class="error-message" id="name-error"></span>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
+                <span class="error-message" id="email-error"></span>
             </div>
             <div class="form-group">
                 <label for="phone">Phone</label>
-                <input type="tel" id="phone" name="phone" required>
+                <input type="tel" id="phone" name="phone" required minlength="10" maxlength="15">
+                <span class="error-message" id="phone-error"></span>
             </div>
             <div class="form-group">
                 <label for="order_details">Order Details</label>
                 <textarea id="order_details" name="order_details" required></textarea>
+                <span class="error-message" id="order_details-error"></span>
             </div>
             <div class="form-group">
                 <label for="special_instructions">Special Instructions</label>

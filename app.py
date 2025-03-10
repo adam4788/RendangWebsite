@@ -15,7 +15,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")  # Removed fallback dev key
+app.secret_key = os.environ.get("SESSION_SECRET")
+app.config['WTF_CSRF_SECRET_KEY'] = os.environ.get("SESSION_SECRET")
+app.config['WTF_CSRF_ENABLED'] = True
 
 # Form validation
 class OrderForm(FlaskForm):
@@ -141,7 +143,8 @@ def get_google_sheets_service():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    form = OrderForm()  # Create an instance of the form to generate CSRF token
+    return render_template('index.html', form=form)
 
 @app.route('/events')
 def events():

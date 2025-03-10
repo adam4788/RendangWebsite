@@ -677,7 +677,7 @@ section.visible {
     }
 
     .navbar {
-        margin-top: 3.5rem; /* Slightly more space on mobile */
+        /* margin-top: 3.5rem; /* Slightly more space on mobile */
     }
 }
 

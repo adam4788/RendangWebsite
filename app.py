@@ -14,10 +14,12 @@ from wtforms.validators import DataRequired, Email, Length, ValidationError
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Add app.config settings at the beginning to ensure CSRF works consistently
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
 app.config['WTF_CSRF_SECRET_KEY'] = os.environ.get("SESSION_SECRET")
 app.config['WTF_CSRF_ENABLED'] = True
+app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # 1 hour token expiration
 
 # Form validation
 class OrderForm(FlaskForm):

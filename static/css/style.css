@@ -249,6 +249,7 @@ section {
     .navbar-menu li {
         width: 100%;
         text-align: center;
+        position: relative;
     }
 
     .navbar-menu li a {
@@ -262,6 +263,18 @@ section {
 
     .hero p {
         font-size: 1rem;
+    }
+    #cart-toggle {
+        display: inline-flex;
+        justify-content: center;
+        padding: 1rem;
+        width: auto;
+    }
+
+    .cart-count {
+        position: static;
+        margin-left: 0.5rem;
+        margin-right: -0.5rem;
     }
 }
 /* Hero Section */
@@ -1082,25 +1095,33 @@ section.visible {
     transform: translateY(-2px);
 }
 
+/* Cart count styles */
 .cart-count {
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
     position: absolute;
     top: -8px;
     right: -8px;
-    background-color: var(--accent-color);
-    color: white;
-    font-size: 0.8rem;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: bold;
 }
 
 #cart-toggle {
     position: relative;
-    padding-right: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem;
+    color: var(--text-color);
+    text-decoration: none;
 }
+
 
 /* Update menu item styles to include add to cart button */
 .menu-item-content {
